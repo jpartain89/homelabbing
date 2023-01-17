@@ -26,6 +26,7 @@
             block: |
               127.0.1.1   {{ inventory_hostname }}
     - name: Packages | Fedora
+      when: ansible_facts['distribution'] == 'Fedora'
       block:
         - name: Packages | Install required packages
           ansible.builtin.dnf:
@@ -35,8 +36,8 @@
         - name: Packages | Remove leaf packages
           ansible.builtin.dnf:
             autoremove: true
-      when: ansible_facts['distribution'] == 'Fedora'
     - name: Packages | Ubuntu
+      when: ansible_facts['distribution'] == 'Ubuntu'
       block:
         - name: Packages | Install required packages
           ansible.builtin.apt:
@@ -52,7 +53,6 @@
             install_recommends: false
           notify: Reboot
           when: "'raspi' in ansible_kernel"
-      when: ansible_facts['distribution'] == 'Ubuntu'
     - name: User Configuration
       block:
         - name: User Configuration | Add additional SSH public keys
@@ -76,6 +76,7 @@
             masked: true
             state: stopped
           when: ansible_facts['distribution'] == 'Ubuntu'
+          failed_when: false
         - name: System Configuration (1) | Enable fstrim
           ansible.builtin.systemd:
             service: fstrim.timer
